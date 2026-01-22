@@ -1,4 +1,3 @@
-
 import React, { memo, useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, Sun, MapPin, Gift, ChevronLeft, ChevronRight, Mail, Phone, MessageCircle, Send, User, AlertCircle } from 'lucide-react';
@@ -126,21 +125,15 @@ const BeautyAssistant = ({ treatments, devices }: { treatments: any[], devices: 
     setIsTyping(true);
 
     try {
-      // 1. Pobieranie klucza w sposób bezpieczny dla Vercel/Vite
-      // 'import.meta.env' jest standardem Vite, ale TypeScript może go nie widzieć bez konfiguracji,
-      // dlatego rzutujemy na 'any', żeby kod się skompilował.
-      // process.env.API_KEY jest fallbackiem.
+      // FIX: Pobieranie klucza API w sposób zgodny z Vite i Vercel
+      const apiKey = (import.meta as any).env?.VITE_API_KEY || (typeof process !== 'undefined' ? process.env?.API_KEY : undefined);
       
-      const apiKeyFromVite = (import.meta as any).env?.VITE_API_KEY;
-      const apiKeyFromProcess = process.env.API_KEY;
-      
-      const API_KEY = apiKeyFromVite || apiKeyFromProcess;
-
-      if (!API_KEY) {
-        throw new Error("Brak klucza API (VITE_API_KEY)");
+      if (!apiKey) {
+        console.error("Missing API Key - Check VITE_API_KEY in Vercel settings");
+        throw new Error("Missing API Key");
       }
 
-      const ai = new GoogleGenAI({ apiKey: API_KEY });
+      const ai = new GoogleGenAI({ apiKey });
       const context = `
         Jesteś ekspertem-asystentem AI o imieniu Ania w prestiżowym salonie GalicaMed Beauty. 
         TWOJA WIEDZA:
@@ -170,7 +163,7 @@ const BeautyAssistant = ({ treatments, devices }: { treatments: any[], devices: 
       setMessages(prev => [...prev, { role: 'ai', text: response.text || 'Przepraszam, nie mogłem przetworzyć zapytania.' }]);
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'ai', text: 'Wystąpił problem z połączeniem. Skontaktuj się z recepcją.' }]);
+      setMessages(prev => [...prev, { role: 'ai', text: 'Wystąpił błąd połączenia. Proszę sprawdzić konfigurację lub skontaktować się z nami telefonicznie.' }]);
     } finally {
       setIsTyping(false);
     }
