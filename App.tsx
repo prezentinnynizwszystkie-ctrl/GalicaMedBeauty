@@ -1,0 +1,463 @@
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { 
+  Menu, X, Sparkles, User, Users, Cpu, Library, Calendar, CheckCircle, Phone, Globe, MapPin, Tag, Mail, Send
+} from 'lucide-react';
+
+import { INITIAL_DATA } from './constants';
+import { BeautyPlannerData } from './types';
+import { supabase } from './lib/supabase';
+import { GoogleGenAI } from "@google/genai";
+import Skeleton from './components/Skeleton';
+
+// Lazy Loading Views for better performance
+const DashboardView = lazy(() => import('./views/DashboardView'));
+const TeamView = lazy(() => import('./views/TeamView'));
+const DevicesView = lazy(() => import('./views/DevicesView'));
+const TreatmentsView = lazy(() => import('./views/TreatmentsView'));
+const TreatmentDetailView = lazy(() => import('./views/TreatmentDetailView'));
+const BlogView = lazy(() => import('./views/BlogView'));
+const PlannerAuthView = lazy(() => import('./views/PlannerAuthView'));
+const PlannerView = lazy(() => import('./views/PlannerView'));
+const PricelistView = lazy(() => import('./views/PricelistView'));
+
+type ViewType = 'splash' | 'menu' | 'planner' | 'planner-auth' | 'about' | 'team' | 'devices' | 'treatments' | 'treatment-detail' | 'blog' | 'pricelist';
+
+const BOOKSY_URL = 'https://booksy.com/pl-pl/dl/show-business/267624?utm_medium=c2c_referral';
+const SHOW_COMPARISON_FEATURE = false;
+
+// Helper for Supabase image optimization
+export const optimizeImg = (url: string, width = 800) => {
+  if (url && url.includes('supabase.co')) {
+    return `${url}?width=${width}&quality=80`;
+  }
+  return url;
+};
+
+const App: React.FC = () => {
+  const [data, setData] = useState<BeautyPlannerData>(INITIAL_DATA);
+  const [view, setView] = useState<ViewType>('splash');
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [menuSliderIndex, setMenuSliderIndex] = useState(0);
+  const [selectedTreatmentId, setSelectedTreatmentId] = useState<string | null>(null);
+  
+  const [staffList, setStaffList] = useState<any[]>([]);
+  const [devicesList, setDevicesList] = useState<any[]>([]);
+  const [treatmentsList, setTreatmentsList] = useState<any[]>([]);
+  const [blogPostsList, setBlogPostsList] = useState<any[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  
+  const [uvIndex, setUvIndex] = useState<number | null>(null);
+  const [locationName, setLocationName] = useState<string>('Bukowina Tatrzańska');
+  const [isLoadingUV, setIsLoadingUV] = useState(false);
+
+  const [selectedToCompare, setSelectedToCompare] = useState<any[]>([]);
+  const [isComparing, setIsComparing] = useState(false);
+  const [comparisonResult, setComparisonResult] = useState<string | null>(null);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [contactMessage, setContactMessage] = useState('');
+  const [isMessageSent, setIsMessageSent] = useState(false);
+
+  // Fix: Added missing currentSelectedTreatment derivation for the detail view
+  const currentSelectedTreatment = treatmentsList.find(t => String(t.id) === String(selectedTreatmentId));
+
+  // Fix: Added missing toggleToCompare function for selection logic
+  const toggleToCompare = (item: any) => {
+    setSelectedToCompare((prev) => {
+      const isSelected = prev.find((i) => i.id === item.id);
+      if (isSelected) {
+        return prev.filter((i) => i.id !== item.id);
+      }
+      return [...prev, item];
+    });
+  };
+
+  const { scrollY } = useScroll();
+  const heroParallax = useTransform(scrollY, [0, 800], [0, 150]);
+  
+  const beautyPlanImages = [
+    optimizeImg("https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/beautyplanhero2.webp"),
+    optimizeImg("https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BeautyPlanHero.webp")
+  ];
+
+  const menuSliderItems = [
+    { id: 'team', label: 'Nasz zespół', desc: 'O Twój wygląd i bezpieczeństwo dbają wykwalifikowani specjaliści...', image: optimizeImg('https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/ZespolHero.webp'), icon: Users },
+    { id: 'devices', label: 'Nasze urządzenia', desc: 'Pracujemy wyłącznie na certyfikowanym sprzęcie High-Tech...', image: optimizeImg('https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/UrzadzeniaHero.webp'), icon: Cpu },
+    { id: 'treatments', label: 'Zabiegi', desc: 'Szeroki wachlarz procedur pielęgnacyjnych...', image: optimizeImg('https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/ZabiegiHero.webp'), icon: Sparkles },
+    { id: 'blog', label: 'Blog GalicaMed', desc: 'Zainspiruj się wiedzą o innowacjach...', image: optimizeImg('https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/bloghero.webp'), icon: Library },
+  ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => setView('menu'), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoadingData(true);
+      try {
+        const fetchSortedData = async (table: string) => {
+          const { data, error } = await supabase.from(table).select('*');
+          if (error) throw error;
+          
+          return data.sort((a, b) => {
+            const valA = a.sort_order ?? a.SortOrder ?? a.sortOrder ?? 9999;
+            const valB = b.sort_order ?? b.SortOrder ?? b.sortOrder ?? 9999;
+            return valA - valB;
+          });
+        };
+
+        const [staffSorted, devicesSorted, treatmentsSorted, blogRes] = await Promise.all([
+          fetchSortedData('GMBZespol'),
+          fetchSortedData('GMBUrzadzenia'),
+          fetchSortedData('GMBZabiegi'),
+          supabase.from('GMBBlog').select('*')
+        ]);
+
+        if (staffSorted) {
+          const mappedStaff = staffSorted.map(s => ({ 
+            id: s.Id, 
+            name: s.Name, 
+            role: s.Title,
+            shortText: s.ShortText,
+            ...s.Text, 
+            image: optimizeImg(s.Photo)
+          }));
+          setStaffList(mappedStaff);
+        }
+
+        if (devicesSorted) {
+          setDevicesList(devicesSorted.map(d => ({ 
+            id: d.Id, 
+            name: d.Nazwa, 
+            shortDesc: d.TextShort, 
+            ...d.TextLong, 
+            image: optimizeImg(d.Photo || d.image || d.TextLong?.image) 
+          })));
+        }
+
+        if (treatmentsSorted) {
+          setTreatmentsList(treatmentsSorted.map(t => ({ 
+            id: t.Id, 
+            name: t.Nazwa, 
+            shortDesc: t.TextShort, 
+            details: t.TextLong, 
+            image: optimizeImg(t.Photo || t.image || t.TextLong?.image), 
+            videoUrl: t.VideoUrl, 
+            pricelist: t.Cennik 
+          })));
+        }
+
+        if (blogRes.data) {
+          setBlogPostsList(blogRes.data.map(p => ({ 
+            id: p.Id, 
+            title: p.Title, 
+            image: optimizeImg(p.Photo), 
+            excerpt: p.Excerpt, 
+            content: p.Text?.content, 
+            category: p.category || 'Edukacja', 
+            readTime: p.readTime || '5 min' 
+          })));
+        }
+      } catch (err) {
+        console.error("Critical Fetch Error:", err);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // Bukowina Tatrzańska na sztywno
+    if (view === 'menu' && uvIndex === null) {
+      fetchUVData(49.3361, 20.0981);
+    }
+  }, [view]);
+
+  const fetchUVData = async (lat: number, lon: number) => {
+    setIsLoadingUV(true);
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: `What is the current UV index for ${lat}, ${lon}? JSON format: {"uv": number, "city": "Bukowina Tatrzańska"}.`,
+        config: { tools: [{ googleSearch: {} }] }
+      });
+      const parsed = JSON.parse(response.text.replace(/```json|```/g, '').trim());
+      setUvIndex(parsed.uv);
+      setLocationName("Bukowina Tatrzańska");
+    } catch {
+      setUvIndex(4);
+    } finally {
+      setIsLoadingUV(false);
+    }
+  };
+
+  const getUVStatus = (uv: number | null) => {
+    if (uv === null) return null;
+    if (uv <= 2) return { level: 'Niski', header: 'Niski indeks UV.', color: 'bg-green-500', textColor: 'text-green-700', icon: MapPin };
+    if (uv <= 5) return { level: 'Umiarkowany', header: 'Umiarkowane słońce.', color: 'bg-yellow-500', textColor: 'text-yellow-700', icon: MapPin };
+    return { level: 'Wysoki', header: 'Wysokie promieniowanie!', color: 'bg-orange-500', textColor: 'text-orange-700', icon: MapPin };
+  };
+
+  const menuItems = [
+    { id: 'menu', label: 'Główna', icon: Globe },
+    { id: 'pricelist', label: 'Cennik', icon: Tag },
+    { id: 'team', label: 'Zespół', icon: Users },
+    { id: 'devices', label: 'Urządzenia', icon: Cpu },
+    { id: 'treatments', label: 'Zabiegi', icon: Sparkles },
+    { id: 'blog', label: 'Blog', icon: Library },
+    { id: 'planner-auth', label: 'Planer', icon: Calendar },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#F9FAFB] relative overflow-x-hidden">
+      <AnimatePresence>{view === 'splash' && <SplashScreen />}</AnimatePresence>
+
+      {view !== 'splash' && (
+        <div className="fixed top-0 left-0 right-0 z-[100] bg-white/70 backdrop-blur-xl border-b border-gray-100/50 transition-all duration-300">
+          <div className="max-w-screen-xl mx-auto px-6 py-4 flex justify-between items-center">
+            <button 
+              onClick={() => setIsSideMenuOpen(true)} 
+              className="md:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <Menu className="w-6 h-6 text-gray-800" />
+            </button>
+
+            <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
+              <motion.img 
+                whileTap={{ scale: 0.95 }}
+                src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" 
+                alt="Logo" 
+                className="h-8 md:h-10 cursor-pointer" 
+                onClick={() => setView('menu')} 
+              />
+            </div>
+
+            <nav className="hidden md:flex items-center gap-8">
+              {menuItems.map((item) => {
+                const isActive = view === item.id || (item.id === 'treatments' && view === 'treatment-detail');
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setView(item.id as ViewType)}
+                    className={`relative text-[11px] uppercase tracking-[0.2em] font-bold transition-all ${
+                      isActive ? 'text-[#D4AF37]' : 'text-gray-400 hover:text-gray-800'
+                    }`}
+                  >
+                    {item.label}
+                    {isActive && (
+                      <motion.div 
+                        layoutId="navUnderline"
+                        className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[#D4AF37] rounded-full"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div className="flex items-center">
+              <motion.a 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href={BOOKSY_URL} target="_blank" rel="noopener noreferrer"
+              >
+                <img src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/reservationButton2.png" className="h-8 md:h-10" />
+              </motion.a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <main className="relative z-10">
+        <Suspense fallback={<div className="pt-32 flex justify-center"><Skeleton className="w-20 h-20 rounded-full" /></div>}>
+          {view === 'menu' && (
+            <DashboardView 
+              heroParallax={heroParallax} 
+              menuSliderItems={menuSliderItems} 
+              menuSliderIndex={menuSliderIndex}
+              prevMenuSlide={() => setMenuSliderIndex((prev) => (prev - 1 + menuSliderItems.length) % menuSliderItems.length)}
+              nextMenuSlide={() => setMenuSliderIndex((prev) => (prev + 1) % menuSliderItems.length)}
+              setView={setView}
+              beautyPlanImageIndex={0}
+              beautyPlanImages={beautyPlanImages}
+              uvIndex={uvIndex}
+              locationName={locationName}
+              isLoadingUV={isLoadingUV}
+              getUVStatus={getUVStatus}
+              fetchUVData={fetchUVData}
+              setIsContactModalOpen={setIsContactModalOpen}
+              treatmentsList={treatmentsList}
+              devicesList={devicesList}
+            />
+          )}
+          {view === 'team' && <TeamView staffList={staffList} setIsContactModalOpen={setIsContactModalOpen} setView={setView} />}
+          {view === 'devices' && <DevicesView devicesList={devicesList} selectedToCompare={selectedToCompare} toggleToCompare={toggleToCompare} setView={setView} showComparison={SHOW_COMPARISON_FEATURE} />}
+          {view === 'treatments' && (
+            <TreatmentsView 
+              treatmentsList={treatmentsList} 
+              selectedToCompare={selectedToCompare} 
+              toggleToCompare={toggleToCompare} 
+              BOOKSY_URL={BOOKSY_URL} 
+              setView={setView} 
+              onSelectTreatment={(id) => {
+                setSelectedTreatmentId(id);
+                setView('treatment-detail');
+              }}
+              showComparison={SHOW_COMPARISON_FEATURE}
+              isLoading={isLoadingData}
+            />
+          )}
+          {view === 'treatment-detail' && currentSelectedTreatment && (
+            <TreatmentDetailView 
+              treatment={currentSelectedTreatment} 
+              onBack={() => setView('treatments')} 
+              BOOKSY_URL={BOOKSY_URL} 
+            />
+          )}
+          {view === 'blog' && <BlogView posts={blogPostsList} setView={setView} isLoading={isLoadingData} />}
+          {view === 'planner-auth' && <PlannerAuthView setView={setView} onAuthSuccess={() => setView('planner')} />}
+          {view === 'planner' && <PlannerView data={data} setView={setView} setIsContactModalOpen={setIsContactModalOpen} />}
+          {view === 'pricelist' && <PricelistView treatments={treatmentsList} setView={setView} />}
+        </Suspense>
+      </main>
+
+      <AnimatePresence>
+        {isSideMenuOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setIsSideMenuOpen(false)}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[110]"
+            />
+            <motion.div 
+              initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 bottom-0 w-[80%] max-w-[320px] bg-white z-[120] shadow-2xl p-8"
+            >
+              <div className="flex justify-between items-center mb-12">
+                <span className="font-serif text-xl">Menu GalicaMed</span>
+                <button onClick={() => setIsSideMenuOpen(false)}><X className="w-6 h-6 text-gray-400" /></button>
+              </div>
+              <nav className="space-y-6">
+                {menuItems.map((item) => (
+                  <button 
+                    key={item.id}
+                    onClick={() => { setView(item.id as ViewType); setIsSideMenuOpen(false); }}
+                    className="flex items-center gap-4 w-full text-left p-2 -ml-2 rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    <item.icon className={`w-5 h-5 ${view === item.id ? 'text-[#D4AF37]' : 'text-gray-400'}`} />
+                    <span className={`font-medium ${view === item.id ? 'text-gray-900' : 'text-gray-600'}`}>{item.label}</span>
+                  </button>
+                ))}
+              </nav>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isContactModalOpen && (
+          <ContactModal isSent={isMessageSent} onClose={() => { setIsContactModalOpen(false); setIsMessageSent(false); }} onSend={() => setIsMessageSent(true)} message={contactMessage} setMessage={setContactMessage} />
+        )}
+      </AnimatePresence>
+
+      {view !== 'splash' && <Footer />}
+    </div>
+  );
+};
+
+const SplashScreen = () => (
+  <motion.div exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center p-12">
+    <img src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" className="w-full max-w-[240px] mb-8" />
+  </motion.div>
+);
+
+const ContactModal = ({ isSent, onClose, onSend, message, setMessage }: any) => (
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[150] bg-black/40 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-6">
+    <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} className="bg-white w-full max-w-lg rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl">
+      {!isSent ? (
+        <div className="flex flex-col items-center">
+          <h2 className="text-2xl font-serif text-gray-800 mb-6">Wyślij wiadomość</h2>
+          <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="W czym możemy pomóc?" className="w-full h-40 bg-gray-50 border border-gray-100 rounded-[24px] p-6 mb-8 resize-none focus:outline-none focus:border-[#D4AF37]" />
+          <button onClick={onSend} className="w-full py-5 bg-[#5C4033] text-white rounded-full font-medium shadow-xl hover:bg-[#4A3329] transition-all">Wyślij wiadomość</button>
+        </div>
+      ) : (
+        <div className="text-center py-10 flex flex-col items-center">
+          <CheckCircle className="w-16 h-16 text-green-600 mb-4" />
+          <h2 className="text-xl font-serif text-gray-800">Wiadomość wysłana!</h2>
+          <p className="text-gray-500 mt-2">Nasz kosmetolog odpowie najszybciej jak to możliwe.</p>
+        </div>
+      )}
+      <button onClick={onClose} className="mt-4 text-gray-400 w-full text-center hover:text-gray-600 py-2">Zamknij</button>
+    </motion.div>
+  </motion.div>
+);
+
+const Footer = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [isSending, setIsSending] = useState(false);
+  const [sentSuccess, setSentSuccess] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSending(true);
+    setTimeout(() => {
+      setIsSending(false);
+      setSentSuccess(true);
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setSentSuccess(false), 5000);
+    }, 1500);
+  };
+
+  return (
+    <footer className="mt-12 bg-white border-t border-gray-100 overflow-hidden">
+      <div className="md:max-w-screen-xl md:mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <div className="space-y-8 text-center lg:text-left">
+            <img src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" className="h-20 mx-auto lg:mx-0 opacity-90" />
+            <div className="space-y-4">
+              <h4 className="font-serif text-2xl text-gray-800">GalicaMed – Zawsze blisko Ciebie</h4>
+              <p className="text-sm text-gray-400 uppercase tracking-widest font-medium leading-relaxed">Poronin | Bukowina Tatrzańska | Nowy Targ | Maniowy</p>
+            </div>
+            <div className="flex flex-col gap-3 pt-4 items-center lg:items-start">
+              <a href="tel:+48502221562" className="flex items-center gap-3 text-gray-600 hover:text-[#D4AF37] transition-colors">
+                <Phone className="w-5 h-5 text-[#D4AF37]" />
+                <span className="font-medium">+48 502 221 562</span>
+              </a>
+              <a href="mailto:recepcja@galicamedbeauty.pl" className="flex items-center gap-3 text-gray-600 hover:text-[#D4AF37] transition-colors">
+                <Mail className="w-5 h-5 text-[#D4AF37]" />
+                <span className="font-medium">recepcja@galicamedbeauty.pl</span>
+              </a>
+            </div>
+            <p className="text-[11px] text-gray-300 tracking-[0.3em] uppercase pt-8">GalicaMed Beauty Planner &copy; 2024</p>
+          </div>
+
+          <div className="bg-gray-50 rounded-[40px] p-8 md:p-12 shadow-inner border border-gray-100/50">
+            <div className="mb-8 text-center lg:text-left">
+              <h3 className="text-2xl font-serif text-gray-800 mb-2">Napisz do nas</h3>
+              <p className="text-gray-500 text-sm">Chętnie odpowiemy na Twoje pytania.</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input required type="text" placeholder="Imię i nazwisko" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-white px-6 py-4 rounded-3xl border border-gray-100 focus:outline-none focus:border-[#D4AF37] transition-all text-sm" />
+                <input required type="email" placeholder="Twój e-mail" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-white px-6 py-4 rounded-3xl border border-gray-100 focus:outline-none focus:border-[#D4AF37] transition-all text-sm" />
+              </div>
+              <textarea required placeholder="Wiadomość..." value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full h-32 bg-white px-6 py-4 rounded-[30px] border border-gray-100 focus:outline-none focus:border-[#D4AF37] transition-all text-sm resize-none" />
+              <button type="submit" disabled={isSending || sentSuccess} className={`w-full py-5 rounded-full font-bold uppercase tracking-widest text-[11px] transition-all flex items-center justify-center gap-2 shadow-xl ${sentSuccess ? 'bg-green-600 text-white' : 'bg-[#5C4033] text-white hover:bg-[#4A3329] shadow-[#5C4033]/20'}`}>
+                {isSending ? <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}><Sparkles className="w-5 h-5" /></motion.div> : sentSuccess ? <><CheckCircle className="w-5 h-5" /> Wiadomość wysłana</> : <><Send className="w-4 h-4" /> Wyślij wiadomość</>}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default App;
