@@ -126,7 +126,21 @@ const BeautyAssistant = ({ treatments, devices }: { treatments: any[], devices: 
     setIsTyping(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // 1. Pobieranie klucza w sposób bezpieczny dla Vercel/Vite
+      // 'import.meta.env' jest standardem Vite, ale TypeScript może go nie widzieć bez konfiguracji,
+      // dlatego rzutujemy na 'any', żeby kod się skompilował.
+      // process.env.API_KEY jest fallbackiem.
+      
+      const apiKeyFromVite = (import.meta as any).env?.VITE_API_KEY;
+      const apiKeyFromProcess = process.env.API_KEY;
+      
+      const API_KEY = apiKeyFromVite || apiKeyFromProcess;
+
+      if (!API_KEY) {
+        throw new Error("Brak klucza API (VITE_API_KEY)");
+      }
+
+      const ai = new GoogleGenAI({ apiKey: API_KEY });
       const context = `
         Jesteś ekspertem-asystentem AI o imieniu Ania w prestiżowym salonie GalicaMed Beauty. 
         TWOJA WIEDZA:
@@ -155,7 +169,8 @@ const BeautyAssistant = ({ treatments, devices }: { treatments: any[], devices: 
 
       setMessages(prev => [...prev, { role: 'ai', text: response.text || 'Przepraszam, nie mogłem przetworzyć zapytania.' }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'ai', text: 'Wystąpił błąd połączenia. Proszę skontaktować się z nami telefonicznie pod numerem +48 502 221 562.' }]);
+      console.error("AI Error:", error);
+      setMessages(prev => [...prev, { role: 'ai', text: 'Wystąpił problem z połączeniem. Skontaktuj się z recepcją.' }]);
     } finally {
       setIsTyping(false);
     }
