@@ -186,7 +186,7 @@ const BeautyAssistant = ({ treatments, devices }: { treatments: any[], devices: 
                 </div>
                 <div className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
-              <span className="text-[10px] font-bold text-[#5C4033] tracking-widest uppercase">Ania</span>
+              <span className="text-[10px] font-bold text-[#5C4033] tracking-widest uppercase">AIania</span>
             </div>
             <div>
               <h3 className="text-xl md:text-2xl font-serif text-gray-800 leading-tight">Twój Wirtualny Konsultant Galicamed</h3>
