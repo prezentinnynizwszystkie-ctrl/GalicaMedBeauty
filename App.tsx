@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { 
-  Menu, X, Sparkles, User, Users, Cpu, Library, Calendar, CheckCircle, Phone, Globe, MapPin, Tag, Mail, Send
+  Menu, X, Sparkles, User, Users, Cpu, Library, Calendar, CheckCircle, Phone, Globe, MapPin, Tag, Mail, Send, Activity
 } from 'lucide-react';
 
 import { INITIAL_DATA } from './constants';
@@ -209,6 +210,7 @@ const App: React.FC = () => {
     { id: 'team', label: 'Zespół', icon: Users },
     { id: 'devices', label: 'Urządzenia', icon: Cpu },
     { id: 'treatments', label: 'Zabiegi', icon: Sparkles },
+    { id: 'mbst', label: 'MBST', icon: Activity, href: 'https://www.terapiambst.pl' },
     { id: 'blog', label: 'Blog', icon: Library },
     { id: 'planner-auth', label: 'Planer', icon: Calendar },
   ];
@@ -239,6 +241,20 @@ const App: React.FC = () => {
 
             <nav className="hidden md:flex items-center gap-8">
               {menuItems.map((item) => {
+                if (item.href) {
+                  return (
+                    <a
+                      key={item.id}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="relative text-[11px] uppercase tracking-[0.2em] font-bold text-gray-400 hover:text-gray-800 transition-all"
+                    >
+                      {item.label}
+                    </a>
+                  );
+                }
+
                 const isActive = view === item.id || (item.id === 'treatments' && view === 'treatment-detail');
                 return (
                   <button
@@ -345,14 +361,28 @@ const App: React.FC = () => {
               </div>
               <nav className="space-y-6">
                 {menuItems.map((item) => (
-                  <button 
-                    key={item.id}
-                    onClick={() => { setView(item.id as ViewType); setIsSideMenuOpen(false); }}
-                    className="flex items-center gap-4 w-full text-left p-2 -ml-2 rounded-xl hover:bg-gray-50 transition-colors"
-                  >
-                    <item.icon className={`w-5 h-5 ${view === item.id ? 'text-[#D4AF37]' : 'text-gray-400'}`} />
-                    <span className={`font-medium ${view === item.id ? 'text-gray-900' : 'text-gray-600'}`}>{item.label}</span>
-                  </button>
+                  item.href ? (
+                    <a
+                      key={item.id}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsSideMenuOpen(false)}
+                      className="flex items-center gap-4 w-full text-left p-2 -ml-2 rounded-xl hover:bg-gray-50 transition-colors"
+                    >
+                      <item.icon className="w-5 h-5 text-gray-400" />
+                      <span className="font-medium text-gray-600">{item.label}</span>
+                    </a>
+                  ) : (
+                    <button 
+                      key={item.id}
+                      onClick={() => { setView(item.id as ViewType); setIsSideMenuOpen(false); }}
+                      className="flex items-center gap-4 w-full text-left p-2 -ml-2 rounded-xl hover:bg-gray-50 transition-colors"
+                    >
+                      <item.icon className={`w-5 h-5 ${view === item.id ? 'text-[#D4AF37]' : 'text-gray-400'}`} />
+                      <span className={`font-medium ${view === item.id ? 'text-gray-900' : 'text-gray-600'}`}>{item.label}</span>
+                    </button>
+                  )
                 ))}
               </nav>
             </motion.div>
@@ -399,60 +429,48 @@ const ContactModal = ({ isSent, onClose, onSend, message, setMessage }: any) => 
 );
 
 const Footer = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [isSending, setIsSending] = useState(false);
-  const [sentSuccess, setSentSuccess] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSending(true);
-    setTimeout(() => {
-      setIsSending(false);
-      setSentSuccess(true);
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setSentSuccess(false), 5000);
-    }, 1500);
-  };
-
   return (
     <footer className="mt-12 bg-white border-t border-gray-100 overflow-hidden">
       <div className="md:max-w-screen-xl md:mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left Side: Brand Info */}
           <div className="space-y-8 text-center lg:text-left">
             <img src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" className="h-20 mx-auto lg:mx-0 opacity-90" />
             <div className="space-y-4">
               <h4 className="font-serif text-2xl text-gray-800">GalicaMed – Zawsze blisko Ciebie</h4>
               <p className="text-sm text-gray-400 uppercase tracking-widest font-medium leading-relaxed">Poronin | Bukowina Tatrzańska | Nowy Targ | Maniowy</p>
             </div>
-            <div className="flex flex-col gap-3 pt-4 items-center lg:items-start">
-              <a href="tel:+48502221562" className="flex items-center gap-3 text-gray-600 hover:text-[#D4AF37] transition-colors">
-                <Phone className="w-5 h-5 text-[#D4AF37]" />
-                <span className="font-medium">+48 502 221 562</span>
-              </a>
-              <a href="mailto:recepcja@galicamedbeauty.pl" className="flex items-center gap-3 text-gray-600 hover:text-[#D4AF37] transition-colors">
-                <Mail className="w-5 h-5 text-[#D4AF37]" />
-                <span className="font-medium">recepcja@galicamedbeauty.pl</span>
-              </a>
-            </div>
             <p className="text-[11px] text-gray-300 tracking-[0.3em] uppercase pt-8">GalicaMed Beauty Planner &copy; 2024</p>
           </div>
 
-          <div className="bg-gray-50 rounded-[40px] p-8 md:p-12 shadow-inner border border-gray-100/50">
+          {/* Right Side: Contact Tile */}
+          <div className="bg-[#5C4033]/5 rounded-[40px] p-8 md:p-12 border border-[#5C4033]/10">
             <div className="mb-8 text-center lg:text-left">
-              <h3 className="text-2xl font-serif text-gray-800 mb-2">Napisz do nas</h3>
-              <p className="text-gray-500 text-sm">Chętnie odpowiemy na Twoje pytania.</p>
+              <h3 className="text-2xl font-serif text-gray-800 mb-2">Skontaktuj się z nami</h3>
+              <p className="text-gray-500 text-sm">Jesteśmy do Twojej dyspozycji.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="text" placeholder="Imię i nazwisko" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-white px-6 py-4 rounded-3xl border border-gray-100 focus:outline-none focus:border-[#D4AF37] transition-all text-sm" />
-                <input required type="email" placeholder="Twój e-mail" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-white px-6 py-4 rounded-3xl border border-gray-100 focus:outline-none focus:border-[#D4AF37] transition-all text-sm" />
-              </div>
-              <textarea required placeholder="Wiadomość..." value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full h-32 bg-white px-6 py-4 rounded-[30px] border border-gray-100 focus:outline-none focus:border-[#D4AF37] transition-all text-sm resize-none" />
-              <button type="submit" disabled={isSending || sentSuccess} className={`w-full py-5 rounded-full font-bold uppercase tracking-widest text-[11px] transition-all flex items-center justify-center gap-2 shadow-xl ${sentSuccess ? 'bg-green-600 text-white' : 'bg-[#5C4033] text-white hover:bg-[#4A3329] shadow-[#5C4033]/20'}`}>
-                {isSending ? <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}><Sparkles className="w-5 h-5" /></motion.div> : sentSuccess ? <><CheckCircle className="w-5 h-5" /> Wiadomość wysłana</> : <><Send className="w-4 h-4" /> Wyślij wiadomość</>}
-              </button>
-            </form>
+            <div className="flex flex-col gap-4">
+              <a href="tel:+48502221562" className="flex items-center gap-6 p-4 bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#D4AF37]/30 transition-all group">
+                <div className="p-4 bg-[#5C4033] text-white rounded-full group-hover:scale-110 transition-transform">
+                  <Phone className="w-6 h-6" />
+                </div>
+                <div className="text-left">
+                  <span className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Zadzwoń do nas</span>
+                  <span className="text-xl font-serif text-gray-800 group-hover:text-[#D4AF37] transition-colors">+48 502 221 562</span>
+                </div>
+              </a>
+
+              <a href="mailto:recepcja@galicamedbeauty.pl" className="flex items-center gap-6 p-4 bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#D4AF37]/30 transition-all group">
+                <div className="p-4 bg-[#5C4033] text-white rounded-full group-hover:scale-110 transition-transform">
+                  <Mail className="w-6 h-6" />
+                </div>
+                <div className="text-left">
+                  <span className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Napisz wiadomość</span>
+                  <span className="text-xl font-serif text-gray-800 group-hover:text-[#D4AF37] transition-colors">recepcja@galicamedbeauty.pl</span>
+                </div>
+              </a>
+            </div>
           </div>
         </div>
       </div>

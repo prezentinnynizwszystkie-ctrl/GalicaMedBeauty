@@ -3,7 +3,7 @@ import { BeautyPlannerData } from './types';
 
 export const INITIAL_DATA: BeautyPlannerData = {
   clientName: "Anna Nowak",
-  cosmetologistName: "Mgr Dominika Sobańska-Miętus",
+  cosmetologistName: "Mgr Dominika Sobańska-Miętuś",
   sections: [
     {
       id: 1,

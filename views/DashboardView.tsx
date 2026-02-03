@@ -1,3 +1,4 @@
+
 import React, { memo, useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, Sun, MapPin, Gift, ChevronLeft, ChevronRight, Mail, Phone, MessageCircle, Send, User, AlertCircle } from 'lucide-react';
@@ -48,6 +49,54 @@ const MenuTile = memo(({ item, setView }: { item: any, setView: (v: any) => void
     </div>
   </motion.div>
 ));
+
+const MbstSection = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    className="bg-white rounded-[40px] overflow-hidden shadow-sm border border-gray-100 mb-8 md:mb-16 relative group cursor-pointer"
+  >
+    <a href="https://www.terapiambst.pl" target="_blank" rel="noopener noreferrer" className="block relative w-full h-[400px] md:h-[500px]">
+      <div className="absolute inset-0">
+         <img
+            src={optimizeImg("https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/GalicaMedBeauty/MBST/lezysobie.webp")}
+            alt="Terapia MBST GalicaMed"
+            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+         />
+         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent md:bg-gradient-to-r md:from-black/80 md:via-black/20 md:to-transparent" />
+      </div>
+
+      <div className="absolute inset-0 p-8 md:p-16 flex flex-col justify-end md:justify-center items-start text-left">
+        <div className="md:w-2/3 lg:w-1/2">
+            <div className="flex items-center gap-2 mb-4">
+                <span className="px-3 py-1 bg-[#D4AF37] text-white text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
+                    Nowość
+                </span>
+                <span className="px-3 py-1 border border-white/30 text-white/90 text-[10px] font-bold uppercase tracking-widest rounded-full backdrop-blur-sm">
+                    Medycyna Regeneracyjna
+                </span>
+            </div>
+
+            <h3 className="text-3xl md:text-5xl font-serif text-white mb-6 leading-tight drop-shadow-xl">
+                Terapia Rezonansem Magnetycznym MBST®
+            </h3>
+
+            <p className="text-gray-100 text-sm md:text-lg leading-relaxed mb-8 drop-shadow-md font-light max-w-xl">
+                Odkryj innowacyjną metodę regeneracji stawów, kości i tkanki chrzęstnej.
+                Bezoperacyjne leczenie zwyrodnień i urazów sportowych teraz dostępne w GalicaMed.
+            </p>
+
+            <button
+                className="px-8 py-4 bg-white text-[#5C4033] rounded-full font-bold text-xs uppercase tracking-widest shadow-xl hover:bg-[#f0f0f0] transition-all flex items-center gap-3 group-hover:gap-4"
+            >
+                Dowiedz się więcej <ArrowRight className="w-4 h-4" />
+            </button>
+        </div>
+      </div>
+    </a>
+  </motion.div>
+);
 
 const VoucherSection = () => (
   <motion.div 
@@ -186,7 +235,7 @@ const BeautyAssistant = ({ treatments, devices }: { treatments: any[], devices: 
                 </div>
                 <div className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
-              <span className="text-[10px] font-bold text-[#5C4033] tracking-widest uppercase">AIania</span>
+              <span className="text-[10px] font-bold text-[#5C4033] tracking-widest uppercase">Ania</span>
             </div>
             <div>
               <h3 className="text-xl md:text-2xl font-serif text-gray-800 leading-tight">Twój Wirtualny Konsultant Galicamed</h3>
@@ -357,6 +406,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <button onClick={nextMenuSlide} className="p-3 rounded-full bg-white border border-gray-100 shadow-sm text-gray-400"><ChevronRight className="w-6 h-6" /></button>
         </div>
+
+        {/* MBST SECTION */}
+        <MbstSection />
 
         <motion.div whileInView={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 10 }} viewport={{ once: true }} className="bg-white rounded-[40px] overflow-hidden shadow-sm border border-gray-100 mb-8 md:mb-16 md:flex md:flex-row md:items-stretch transition-shadow cursor-pointer" onClick={() => setView('planner-auth')}>
           <div className="h-64 w-full overflow-hidden relative md:h-auto md:w-1/2">
