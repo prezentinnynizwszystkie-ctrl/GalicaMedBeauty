@@ -30,7 +30,8 @@ const SHOW_COMPARISON_FEATURE = false;
 // Helper for Supabase image optimization
 export const optimizeImg = (url: string, width = 800) => {
   if (url && url.includes('supabase.co')) {
-    return `${url}?width=${width}&quality=80`;
+    const base = url.split('?')[0];
+    return `${base}?width=${width}&quality=80`;
   }
   return url;
 };
