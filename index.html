@@ -4,36 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GalicaMed Beauty</title>
-<!-- FIX: stary projekt Supabase (thsqpnmvfkawaxyeitcv) został usunięty. Ten shim przepisuje
-     wszystkie zahardkodowane URL-e obrazów na nowy projekt (thsqpnmvfkawaxyeitcv) w locie. -->
-<script>
-(function () {
-  var OLD = 'thsqpnmvfkawaxyeitcv.supabase.co';
-  var NEW = 'thsqpnmvfkawaxyeitcv.supabase.co';
-  function fixEl(e) {
-    if (!e || e.nodeType !== 1) return;
-    if (e.tagName === 'IMG') {
-      var s = e.getAttribute('src');
-      if (s && s.indexOf(OLD) > -1) e.setAttribute('src', s.split(OLD).join(NEW));
-    }
-    var st = e.getAttribute && e.getAttribute('style');
-    if (st && st.indexOf(OLD) > -1) e.setAttribute('style', st.split(OLD).join(NEW));
-  }
-  function scan(root) {
-    try { if (root.querySelectorAll) root.querySelectorAll('img,[style]').forEach(fixEl); } catch (err) {}
-  }
-  var mo = new MutationObserver(function (muts) {
-    muts.forEach(function (m) {
-      fixEl(m.target);
-      if (m.addedNodes) m.addedNodes.forEach(function (n) { if (n.nodeType === 1) { fixEl(n); scan(n); } });
-    });
-  });
-  document.addEventListener('DOMContentLoaded', function () {
-    scan(document);
-    mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src', 'style'] });
-  });
-})();
-</script>
 <link rel="icon" type="image/png" href="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
@@ -46,7 +16,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 .font-serif {
-  font-family: 'Playfair+Display', serif;
+  font-family: 'Playfair Display', serif;
   letter-spacing: -0.01em;
 }
 .font-handwritten {
@@ -58,7 +28,7 @@ p {
 /* Drop-cap for blog magazine look */
 .drop-cap::first-letter {
   float: left;
-  font-family: 'Playfair+Display', serif;
+  font-family: 'Playfair Display', serif;
   font-size: 4.5rem;
   line-height: 0.8;
   padding-top: 4px;
