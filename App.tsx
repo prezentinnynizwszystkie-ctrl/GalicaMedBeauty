@@ -80,15 +80,15 @@ const App: React.FC = () => {
   const heroParallax = useTransform(scrollY, [0, 800], [0, 150]);
   
   const beautyPlanImages = [
-    optimizeImg("https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/beautyplanhero2.webp"),
-    optimizeImg("https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BeautyPlanHero.webp")
+    optimizeImg("https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/beautyplanhero2.webp"),
+    optimizeImg("https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/BeautyPlanHero.webp")
   ];
 
   const menuSliderItems = [
-    { id: 'team', label: 'Nasz zespół', desc: 'O Twój wygląd i bezpieczeństwo dbają wykwalifikowani specjaliści...', image: optimizeImg('https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/ZespolHero.webp'), icon: Users },
-    { id: 'devices', label: 'Nasze urządzenia', desc: 'Pracujemy wyłącznie na certyfikowanym sprzęcie High-Tech...', image: optimizeImg('https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/UrzadzeniaHero.webp'), icon: Cpu },
-    { id: 'treatments', label: 'Zabiegi', desc: 'Szeroki wachlarz procedur pielęgnacyjnych...', image: optimizeImg('https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/ZabiegiHero.webp'), icon: Sparkles },
-    { id: 'blog', label: 'Blog GalicaMed', desc: 'Zainspiruj się wiedzą o innowacjach...', image: optimizeImg('https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/bloghero.webp'), icon: Library },
+    { id: 'team', label: 'Nasz zespół', desc: 'O Twój wygląd i bezpieczeństwo dbają wykwalifikowani specjaliści...', image: optimizeImg('https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/ZespolHero.webp'), icon: Users },
+    { id: 'devices', label: 'Nasze urządzenia', desc: 'Pracujemy wyłącznie na certyfikowanym sprzęcie High-Tech...', image: optimizeImg('https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/UrzadzeniaHero.webp'), icon: Cpu },
+    { id: 'treatments', label: 'Zabiegi', desc: 'Szeroki wachlarz procedur pielęgnacyjnych...', image: optimizeImg('https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/ZabiegiHero.webp'), icon: Sparkles },
+    { id: 'blog', label: 'Blog GalicaMed', desc: 'Zainspiruj się wiedzą o innowacjach...', image: optimizeImg('https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/bloghero.webp'), icon: Library },
   ];
 
   useEffect(() => {
@@ -233,7 +233,7 @@ const App: React.FC = () => {
             <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
               <motion.img 
                 whileTap={{ scale: 0.95 }}
-                src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" 
+                src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" 
                 alt="Logo" 
                 className="h-8 md:h-10 cursor-pointer" 
                 onClick={() => setView('menu')} 
@@ -283,7 +283,7 @@ const App: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
                 href={BOOKSY_URL} target="_blank" rel="noopener noreferrer"
               >
-                <img src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/reservationButton2.png" className="h-8 md:h-10" />
+                <img src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/reservationButton2.png" className="h-8 md:h-10" />
               </motion.a>
             </div>
           </div>
@@ -404,7 +404,7 @@ const App: React.FC = () => {
 
 const SplashScreen = () => (
   <motion.div exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-white flex flex-col items-center justify-center p-12">
-    <img src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" className="w-full max-w-[240px] mb-8" />
+    <img src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" className="w-full max-w-[240px] mb-8" />
   </motion.div>
 );
 
@@ -436,7 +436,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left Side: Brand Info */}
           <div className="space-y-8 text-center lg:text-left">
-            <img src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" className="h-20 mx-auto lg:mx-0 opacity-90" />
+            <img src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" className="h-20 mx-auto lg:mx-0 opacity-90" />
             <div className="space-y-4">
               <h4 className="font-serif text-2xl text-gray-800">GalicaMed – Zawsze blisko Ciebie</h4>
               <p className="text-sm text-gray-400 uppercase tracking-widest font-medium leading-relaxed">Poronin | Bukowina Tatrzańska | Nowy Targ | Maniowy</p>

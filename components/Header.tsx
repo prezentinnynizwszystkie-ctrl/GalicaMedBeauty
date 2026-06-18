@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ cosmetologistName }) => {
         className="mb-8 flex justify-center"
       >
         <img 
-          src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" 
+          src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png" 
           alt="Beauty Galicamed Logo" 
           className="h-16 w-auto object-contain"
           loading="lazy"
@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({ cosmetologistName }) => {
       >
         <div className="relative w-full max-w-[200px] h-[260px] mb-6 overflow-hidden rounded-t-[60px]">
           <img 
-            src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/dom1.png" 
+            src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/dom1.png" 
             alt={cosmetologistName}
             className="w-full h-full object-cover object-top"
             loading="lazy"

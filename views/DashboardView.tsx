@@ -60,7 +60,7 @@ const MbstSection = () => (
     <a href="https://www.terapiambst.pl" target="_blank" rel="noopener noreferrer" className="block relative w-full h-[400px] md:h-[500px]">
       <div className="absolute inset-0">
          <img
-            src={optimizeImg("https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/GalicaMedBeauty/MBST/lezysobie.webp")}
+            src={optimizeImg("https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/GalicaMedBeauty/MBST/lezysobie.webp")}
             alt="Terapia MBST GalicaMed"
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
          />
@@ -145,7 +145,7 @@ const VoucherSection = () => (
     
     <div className="lg:w-2/5 min-h-[300px] relative overflow-hidden">
       <img 
-        src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/GalicaMedBeauty/InneFoty/voucherhero1.webp" 
+        src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/GalicaMedBeauty/InneFoty/voucherhero1.webp" 
         alt="Voucher GalicaMed" 
         className="absolute inset-0 w-full h-full object-cover"
       />
@@ -228,7 +228,7 @@ const BeautyAssistant = ({ treatments, devices }: { treatments: any[], devices: 
               <div className="relative">
                 <div className="p-1 bg-[#D4AF37]/20 rounded-full">
                   <img 
-                    src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/GalicaMedBeauty/FotoStaff/avatarai.webp" 
+                    src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/GalicaMedBeauty/FotoStaff/avatarai.webp" 
                     alt="AI Assistant Ania" 
                     className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover shadow-sm border border-white"
                   />
@@ -347,8 +347,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({
       <div className="relative w-full h-[85vh] md:h-[700px] overflow-hidden mb-8">
         <motion.div style={{ y: heroParallax }} className="w-full h-full">
           <picture className="w-full h-full">
-            <source media="(min-width: 768px)" srcSet="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/GalicaMedBeauty/herodesktopwww.webp" />
-            <img src="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/GalicaMedBeauty/herowww.webp" alt="GalicaMed Beauty Hero" className="w-full h-full object-cover object-center scale-105" />
+            <source media="(min-width: 768px)" srcSet="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/GalicaMedBeauty/herodesktopwww.webp" />
+            <img src="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/GalicaMedBeauty/herowww.webp" alt="GalicaMed Beauty Hero" className="w-full h-full object-cover object-center scale-105" />
           </picture>
         </motion.div>
         <div className="absolute inset-0 bg-black/20 pointer-events-none" />

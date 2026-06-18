@@ -32,7 +32,7 @@ const BlogView: React.FC<any> = ({ posts, setView, isLoading = false }) => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-12 md:max-w-screen-xl md:mx-auto md:px-12">
       <div className="relative h-64 md:h-[500px] w-full overflow-hidden rounded-b-[40px] md:rounded-[60px] shadow-lg mb-12">
-        <img src={optimizeImg("https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/bloghero.webp", 1200)} className="w-full h-full object-cover" alt="Blog Hero" />
+        <img src={optimizeImg("https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/HeroPhotos/bloghero.webp", 1200)} className="w-full h-full object-cover" alt="Blog Hero" />
         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center p-6 text-center backdrop-blur-[2px]">
            <h1 className="text-4xl md:text-8xl font-serif text-white mb-4 tracking-tighter">Magazyn Piękna</h1>
            <p className="text-white/90 text-sm md:text-2xl italic font-handwritten">Ekskluzywna wiedza od ekspertów GalicaMed</p>
