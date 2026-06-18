@@ -1,57 +1,86 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GalicaMed Beauty</title>
-    <link rel="icon" type="image/png" href="https://pbyfajvltehsuugpayej.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F9FAFB;
-            color: #4A4A4A;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        .font-serif {
-            font-family: 'Playfair+Display', serif;
-            letter-spacing: -0.01em;
-        }
-        .font-handwritten {
-            font-family: 'Alex Brush', cursive;
-        }
-        p {
-            line-height: 1.7;
-        }
-        /* Drop-cap for blog magazine look */
-        .drop-cap::first-letter {
-            float: left;
-            font-family: 'Playfair+Display', serif;
-            font-size: 4.5rem;
-            line-height: 0.8;
-            padding-top: 4px;
-            padding-right: 12px;
-            padding-left: 3px;
-            color: #D4AF37;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #F9FAFB;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #E5E7EB;
-            border-radius: 10px;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GalicaMed Beauty</title>
+<!-- FIX: stary projekt Supabase (pbyfajvltehsuugpayej) został usunięty. Ten shim przepisuje
+     wszystkie zahardkodowane URL-e obrazów na nowy projekt (thsqpnmvfkawaxyeitcv) w locie. -->
+<script>
+(function () {
+  var OLD = 'pbyfajvltehsuugpayej.supabase.co';
+  var NEW = 'thsqpnmvfkawaxyeitcv.supabase.co';
+  function fixEl(e) {
+    if (!e || e.nodeType !== 1) return;
+    if (e.tagName === 'IMG') {
+      var s = e.getAttribute('src');
+      if (s && s.indexOf(OLD) > -1) e.setAttribute('src', s.split(OLD).join(NEW));
+    }
+    var st = e.getAttribute && e.getAttribute('style');
+    if (st && st.indexOf(OLD) > -1) e.setAttribute('style', st.split(OLD).join(NEW));
+  }
+  function scan(root) {
+    try { if (root.querySelectorAll) root.querySelectorAll('img,[style]').forEach(fixEl); } catch (err) {}
+  }
+  var mo = new MutationObserver(function (muts) {
+    muts.forEach(function (m) {
+      fixEl(m.target);
+      if (m.addedNodes) m.addedNodes.forEach(function (n) { if (n.nodeType === 1) { fixEl(n); scan(n); } });
+    });
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    scan(document);
+    mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src', 'style'] });
+  });
+})();
+</script>
+<link rel="icon" type="image/png" href="https://thsqpnmvfkawaxyeitcv.supabase.co/storage/v1/object/public/MainApp/GM/BEAUTY%20LOGO%20GALICAMED.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #F9FAFB;
+  color: #4A4A4A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.font-serif {
+  font-family: 'Playfair+Display', serif;
+  letter-spacing: -0.01em;
+}
+.font-handwritten {
+  font-family: 'Alex Brush', cursive;
+}
+p {
+  line-height: 1.7;
+}
+/* Drop-cap for blog magazine look */
+.drop-cap::first-letter {
+  float: left;
+  font-family: 'Playfair+Display', serif;
+  font-size: 4.5rem;
+  line-height: 0.8;
+  padding-top: 4px;
+  padding-right: 12px;
+  padding-left: 3px;
+  color: #D4AF37;
+}
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #F9FAFB;
+}
+::-webkit-scrollbar-thumb {
+  background: #E5E7EB;
+  border-radius: 10px;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+</style>
 <script type="importmap">
 {
   "imports": {
@@ -68,7 +97,7 @@
 <link rel="stylesheet" href="/index.css">
 </head>
 <body>
-    <div id="root"></div>
+<div id="root"></div>
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
